@@ -7,6 +7,7 @@
 
 namespace yii\elasticsearch;
 
+use yii\base\BaseObject;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
 use yii\helpers\Json;
@@ -17,7 +18,7 @@ use yii\helpers\Json;
  * @author Carsten Brandt <mail@cebe.cc>
  * @since 2.0
  */
-class QueryBuilder extends \yii\base\Object
+class QueryBuilder extends BaseObject
 {
     /**
      * @var Connection the database connection.
@@ -260,12 +261,12 @@ class QueryBuilder extends \yii\base\Object
     private function buildBoolCondition($operator, $operands)
     {
         $parts = [];
-        if ($operator == 'and') {
+        if ($operator === 'and') {
             $clause = 'must';
-        } else if ($operator == 'or') {
+        } else if ($operator === 'or') {
             $clause = 'should';
         } else {
-            throw InvalidParamExcepton("Operator should be 'or' or 'and'");
+            throw new InvalidParamException("Operator should be 'or' or 'and'");
         }
 
         foreach ($operands as $operand) {
@@ -294,11 +295,11 @@ class QueryBuilder extends \yii\base\Object
         }
 
         list($column, $value1, $value2) = $operands;
-        if ($column == '_id') {
+        if ($column === '_id') {
             throw new NotSupportedException('Between condition is not supported for the _id field.');
         }
         $filter = ['range' => [$column => ['gte' => $value1, 'lte' => $value2]]];
-        if ($operator == 'not between') {
+        if ($operator === 'not between') {
             $filter = ['bool' => ['must_not'=>$filter]];
         }
 
@@ -334,7 +335,7 @@ class QueryBuilder extends \yii\base\Object
                 unset($values[$i]);
             }
         }
-        if ($column == '_id') {
+        if ($column === '_id') {
             if (empty($values) && $canBeNull) { // there is no null pk
                 $filter = ['terms' => ['_uid' => []]]; // this condition is equal to WHERE false
             } else {
@@ -374,7 +375,7 @@ class QueryBuilder extends \yii\base\Object
             }
         }
 
-        if ($operator == 'not in') {
+        if ($operator === 'not in') {
             $filter = [
                 'bool' => [
                     'must_not' => $filter,
@@ -399,7 +400,7 @@ class QueryBuilder extends \yii\base\Object
         }
 
         list($column, $value) = $operands;
-        if ($column == '_id') {
+        if ($column === '_id') {
             $column = '_uid';
         }
 

@@ -7,7 +7,7 @@
 
 namespace yii\elasticsearch;
 
-use yii\base\Object;
+use yii\base\BaseObject;
 
 /**
  * BatchQueryResult represents a batch query from which you can retrieve data in batches.
@@ -37,7 +37,7 @@ use yii\base\Object;
  * @author Konstantin Sirotkin <beowulfenator@gmail.com>
  * @since 2.0.4
  */
-class BatchQueryResult extends Object implements \Iterator
+class BatchQueryResult extends BaseObject implements \Iterator
 {
     /**
      * @var Connection the DB connection to be used when performing batch query.
@@ -160,6 +160,9 @@ class BatchQueryResult extends Object implements \Iterator
                 $cmd = $this->query->createCommand($this->db);
             }
             $result = $cmd->search($options);
+            if ($result === false) {
+                throw new Exception('Elasticsearch search query failed.');
+            }
         } else {
             //subsequent queries - do scroll
             $result = $this->query->createCommand($this->db)->scroll([
